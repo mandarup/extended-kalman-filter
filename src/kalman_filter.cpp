@@ -68,24 +68,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   float rho = sqrt(px *px + py *py );
   float theta = atan2(py,px);
-
-  // cout << red << "Theta: " << theta  <<  ", PI: " << M_PI << reset << endl;
-  // while (theta >  M_PI){
-  //     theta -= 2 * M_PI;
-  //     cout << red << "Theta after normalizing: " << theta <<  reset  << endl;
-  // }
-  // while (theta <  -M_PI){
-  //     theta += 2 * M_PI;
-  //     cout << red << "Theta after normalizing: " << theta << reset  << endl;
-  // }
-
   float rho_dot = ( px * vx + py * vy )/ rho;
 
   VectorXd z_pred = VectorXd(3);
   z_pred << rho, theta, rho_dot;
-
-  //VectorXd y = z - z_pred;
-  //VectorXd z_pred = H_ * x_;
 
   VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
@@ -94,6 +80,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   MatrixXd PHt = P_ * Ht;
   MatrixXd K = PHt * Si;
 
+  // normalize angle to (-pi,pi)
   cout << red << "y: " << y  <<  ", PI: " << M_PI << reset << endl;
   for(int i=0; i < y.size(); i++){
     while (y[i] >  M_PI){
@@ -105,9 +92,6 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
         cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
     }
   }
-  // cout << red << "y after normalizing: " << y <<  reset  << endl;
-
-
 
   //new estimate
   x_ = x_ + (K * y);
