@@ -81,16 +81,17 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   MatrixXd K = PHt * Si;
 
   // normalize angle to (-pi,pi)
-  cout << red << "y: " << y  <<  ", PI: " << M_PI << reset << endl;
+  //cout << red << "y: " << y  <<  ", PI: " << M_PI << reset << endl;
   for(int i=0; i < y.size(); i++){
     while (y[i] >  M_PI){
         y[i] -= 2 * M_PI;
-        cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
+        //cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
+        while (y[i] <  -M_PI){
+            y[i] += 2 * M_PI;
+            //cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
+        }
     }
-    while (y[i] <  -M_PI){
-        y[i] += 2 * M_PI;
-        cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
-    }
+
     // while (y(1)>M_PI)
     //   {
     //       y(1) -= 2 * M_PI;
