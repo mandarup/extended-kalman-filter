@@ -26,12 +26,12 @@ FusionEKF::FusionEKF() {
 
   //measurement covariance matrix - laser
   R_laser_ << 0.0225, 0,
-        0, 0.0225;
+             0, 0.0225;
 
   //measurement covariance matrix - radar
   R_radar_ << 0.09, 0, 0,
-        0, 0.0009, 0,
-        0, 0, 0.09;
+              0, 0.0009, 0,
+              0, 0, 0.09;
 
   /**
   TODO:
@@ -42,10 +42,21 @@ FusionEKF::FusionEKF() {
              0, 1, 0, 0;
 
   //create a 4D state vector, we don't know yet the values of the x state
- // 	ekf_.x_ = VectorXd(4);
+ 	ekf_.x_ = VectorXd(4);
 
+ //the initial transition matrix F_
+ ekf_.F_ = MatrixXd(4, 4);
+ ekf_.F_ << 1, 0, 1, 0,
+           0, 1, 0, 1,
+           0, 0, 1, 0,
+           0, 0, 0, 1;
 
-
+ //state covariance matrix P
+  ekf_.P_ = MatrixXd(4, 4);
+  ekf_.P_ << 1, 0, 0, 0,
+      		  0, 1, 0, 0,
+      		  0, 0, 1000, 0,
+      		  0, 0, 0, 1000;
 
 }
 
@@ -71,6 +82,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
+    // ekf_.x_ << 1, 1, 5, 0;
+
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       /**
@@ -90,19 +103,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       ekf_.x_(1) = measurement_pack.raw_measurements_[1]; // py
     }
 
-    //the initial transition matrix F_
-    ekf_.F_ = MatrixXd(4, 4);
-    ekf_.F_ << 1, 0, 1, 0,
-          0, 1, 0, 1,
-          0, 0, 1, 0,
-          0, 0, 0, 1;
 
-    //state covariance matrix P
-   	ekf_.P_ = MatrixXd(4, 4);
-   	ekf_.P_ << 1, 0, 0, 0,
-   			  0, 1, 0, 0,
-   			  0, 0, 1000, 0,
-   			  0, 0, 0, 1000;
 
     previous_timestamp_ = measurement_pack.timestamp_;
 
@@ -163,8 +164,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // Radar updates
-    Tools t;
-    Hj_ = t.CalculateJacobian(ekf_.x_);
+    Hj_ = tools.CalculateJacobian(ekf_.x_);
+    cout << "Jacobian: \n" << Hj_ << endl;
     ekf_.H_ = Hj_;
     ekf_.R_ = R_radar_;
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
@@ -173,7 +174,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     ekf_.H_ = H_laser_;
     ekf_.R_ = R_laser_;
     ekf_.Update(measurement_pack.raw_measurements_);
-
   }
 
   // print the output

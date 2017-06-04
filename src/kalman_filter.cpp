@@ -60,7 +60,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   float rho = sqrt(px *px + py *py );
   float theta = atan2(py,px);
-  float rho_dot = sqrt( (px * vx + py * vy) / rho);
+  float rho_dot = ( px * vx + py * vy )/ rho;
   VectorXd z_pred = VectorXd(3);
   z_pred << rho, theta, rho_dot;
 
