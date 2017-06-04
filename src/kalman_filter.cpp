@@ -75,9 +75,9 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   VectorXd y = z - z_pred;
   MatrixXd Ht = H_.transpose();
-  MatrixXd S = H_ * P_ * Ht + R_;
-  MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
+  MatrixXd S = H_ * PHt + R_;
+  MatrixXd Si = S.inverse();
   MatrixXd K = PHt * Si;
 
   // normalize angle to (-pi,pi)
@@ -91,6 +91,14 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
         y[i] += 2 * M_PI;
         cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
     }
+    // while (y(1)>M_PI)
+    //   {
+    //       y(1) -= 2 * M_PI;
+    //   }
+    //   while (y(1)<-M_PI)
+    //   {
+    //       y(1) += 2 * M_PI;
+    //   }
   }
 
   //new estimate
