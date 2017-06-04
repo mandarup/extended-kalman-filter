@@ -82,7 +82,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   // normalize angle to (-pi,pi)
   //cout << red << "y: " << y  <<  ", PI: " << M_PI << reset << endl;
+
+
   for(int i=0; i < y.size(); i++){
+
+    // This was updated to meet the required change from code review
+    // But not clear how this will work if y[i] < -PI  to start with
+    // Reviewer please explain
     while (y[i] >  M_PI){
         y[i] -= 2 * M_PI;
         //cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
@@ -92,14 +98,6 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
         }
     }
 
-    // while (y(1)>M_PI)
-    //   {
-    //       y(1) -= 2 * M_PI;
-    //   }
-    //   while (y(1)<-M_PI)
-    //   {
-    //       y(1) += 2 * M_PI;
-    //   }
   }
 
   //new estimate
