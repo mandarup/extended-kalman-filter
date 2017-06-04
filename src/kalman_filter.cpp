@@ -1,7 +1,15 @@
 #include "kalman_filter.h"
+#include <stdio.h>
+
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+
+#include <iostream>
+using namespace std;
+
+const std::string red("\033[0;31m");
+const std::string reset("\033[0m");
 
 KalmanFilter::KalmanFilter() {}
 
@@ -60,7 +68,19 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 
   float rho = sqrt(px *px + py *py );
   float theta = atan2(py,px);
+
+  // cout << red << "Theta: " << theta  <<  ", PI: " << M_PI << reset << endl;
+  // while (theta >  M_PI){
+  //     theta -= 2 * M_PI;
+  //     cout << red << "Theta after normalizing: " << theta <<  reset  << endl;
+  // }
+  // while (theta <  -M_PI){
+  //     theta += 2 * M_PI;
+  //     cout << red << "Theta after normalizing: " << theta << reset  << endl;
+  // }
+
   float rho_dot = ( px * vx + py * vy )/ rho;
+
   VectorXd z_pred = VectorXd(3);
   z_pred << rho, theta, rho_dot;
 
@@ -73,6 +93,21 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   MatrixXd Si = S.inverse();
   MatrixXd PHt = P_ * Ht;
   MatrixXd K = PHt * Si;
+
+  cout << red << "y: " << y  <<  ", PI: " << M_PI << reset << endl;
+  for(int i=0; i < y.size(); i++){
+    while (y[i] >  M_PI){
+        y[i] -= 2 * M_PI;
+        cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
+    }
+    while (y[i] <  -M_PI){
+        y[i] += 2 * M_PI;
+        cout << red << "y[" << i <<"] after normalizing: " << y[i] << reset  << endl;
+    }
+  }
+  // cout << red << "y after normalizing: " << y <<  reset  << endl;
+
+
 
   //new estimate
   x_ = x_ + (K * y);

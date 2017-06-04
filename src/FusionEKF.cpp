@@ -81,8 +81,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
-    // ekf_.x_ << 1, 1, 5, 0;
+    // ekf_.x_ << 1, 1, 1, 1;
+    ekf_.x_ << 1, 1, 5.19, 0;
 
 
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
@@ -124,12 +124,13 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
 
+
    //acceleration noise components
  	float noise_ax;
  	float noise_ay;
 
-   noise_ax = 9;
-   noise_ay = 9;
+  noise_ax = 9.;
+  noise_ay = 9.;
 
    //compute the time elapsed between the current and previous measurements
  	float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;	//dt - expressed in seconds
@@ -146,9 +147,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
  	//set the process covariance matrix Q
  	ekf_.Q_ = MatrixXd(4, 4);
  	ekf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
- 			   0, dt_4/4*noise_ay, 0, dt_3/2*noise_ay,
- 			   dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
- 			   0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
+     			   0, dt_4/4*noise_ay, 0, dt_3/2*noise_ay,
+     			   dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
+     			   0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
 
   ekf_.Predict();
 
